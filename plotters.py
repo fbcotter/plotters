@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+__author__ = "Fergal Cotter"
+exec(open("./version.py").read())       # Imports the __version__ variable
+__version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
+
 
 def imshowNormalize(data, vmin=None, vmax=None, return_scale=False):
     """ Define a function to scale colour filters

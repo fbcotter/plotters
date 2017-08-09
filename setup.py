@@ -1,5 +1,6 @@
 import os
 from setuptools import setup
+exec(open('./version.py').read())  # Imports the __version__ variable
 
 
 # Utility function to read the README file.
@@ -21,7 +22,7 @@ classifiers = [
 
 setup(
     name='plotters',
-    version='0.0.1',
+    version=__version__,    # noqa
     author="Fergal Cotter",
     author_email="fbc23@cam.ac.uk",
     description=("Convenience Functions for Plotting in Matplotlib"),
