@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+#  import os
 
 __author__ = "Fergal Cotter"
-exec(open(os.path.join(os.path.dirname(__file__), 'version.py')).read())
+__version__ = "0.0.1"
+#  exec(open(os.path.join(os.path.dirname(__file__), 'version.py')).read())
 __version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
 
 
