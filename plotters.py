@@ -1,10 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#  import os
 
 __author__ = "Fergal Cotter"
-__version__ = "0.0.1"
-#  exec(open(os.path.join(os.path.dirname(__file__), 'version.py')).read())
+__version__ = "0.0.2"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
 
 
@@ -17,7 +15,8 @@ def imshowNormalize(data, vmin=None, vmax=None, return_scale=False):
 
     Parameters
     ----------
-    data : ndarray of floats
+    data : ndarray
+        The input - numpy array of any shape.
     vmin : None or float
         Minimum scale value. If set to None, will use the minimum value in data
     vmax : None or float
@@ -56,9 +55,9 @@ def imshow(data, ax=None):
 
     Parameters
     ----------
-    data : ndarray of floats
-        Data to plot
-    ax : matplotlib axis or None
+    data : ndarray
+        Data to plot.
+    ax : None or :py:class:`matplotlib.axes.Axes`.
         If None, will get the currently active axis and plot to it. Otherwise,
         can give it the axis object to plot to.
     """
@@ -79,13 +78,13 @@ def plot_sidebyside(im1, im2, axes=None):
 
     Parameters
     ----------
-    im1 : ndarray of floats
+    im1 : ndarray
         Data to plot. Values can be in any range
-    im2 : ndarray of floats
+    im2 : ndarray
         Data to plot. Values can be in any range
-    axes : None or array of matplotlib axes of shape (2,)
+    axes : None or ndarray(:py:class:`matplotlib.axes.Axes`)
         The axes to plot im1 and im2 to. If set to None, will create new axes
-        and plot to them.
+        and plot to them. If an ndarray, should be of shape (2, ).
     """
     assert im1.shape == im2.shape
 
@@ -115,19 +114,18 @@ def zoom_sidebyside(im1, im2, centre, size, axes=None):
 
     Parameters
     ----------
-    im1 : ndarray of floats
-        The initial (fed) image
-    im2 : ndarray of floats
-        The reconstructed image
-    centre : list-like array of floats of shape (2,) or ints of shape (2,)
-        If list of is of floats, then they represent the row and col coordinates
+    im1 : ndarray(float)
+        The initial (fed) image.
+    im2 : ndarray(float)
+        The reconstructed image.
+    centre : list(int) or list(float)
+        If a list is of floats, then interpreted as the row and col coordinates
         of the centre position in the range 0 to 1 (0 is the left/top and 1 is
-        the right/bottom).
-        If list of is of ints, then they represent the pixel coordinates for the
-        centre position.
-    axes : None or array of matplotlib axes of shape (2,)
+        the right/bottom).  If list of is of ints, then they represent the pixel
+        coordinates for the centre position.
+    axes : None or ndarray(:py:class:`matplotlib.axes.Axes`)
         The axes to plot im1 and im2 to. If set to None, will create new axes
-        and plot to them.
+        and plot to them. If an ndarray, should be of shape (2, ).
     """
     assert im1.shape == im2.shape
 
@@ -170,26 +168,27 @@ def plot_filters_colour(w, cols=8, draw=True, ax=None):
 
     Parameters
     ----------
-    w : ndarray of floats of shape (x, y, 3, c)
-        array of imgs to show
+    w : ndarray(float)
+        Array of imgs to show. Should be of shape (x, y, 3, c).
     cols : int
         number of columns to split the filters into
     draw : bool
         True means we will make the calls to plt.imshow, False and we won't,
         only return the big_im array for the caller to handle as they please.
-    ax : None or matplotlib axis
+    ax : None or :py:class:`matplotlib.axes.Axes`.
         The axis to plot to. If set to None, will create a new axis and plot to
         it (only if draw is True).
 
     Returns
     -------
-    out : tuple of (big_im, vmin, vmax)
-
-        * big_im - Big image, scaled so all the values lie in the range [0,1]
-          We do this scaling as matplotlib can't handle well colour images of
-          arbitrary ranges.
-        * vmin - the minimum value of the big_im (becomes 0 after scaling)
-        * vmax - the maximum value of the big_im (becomes 1 after scaling)
+    big_im : ndarray
+        Big image, scaled so all the values lie in the range [0,1] We do this
+        scaling as matplotlib can't handle well colour images of arbitrary
+        ranges.
+    vmin : float
+        The minimum value of the big_im (becomes 0 after scaling)
+    vmax : float
+        The maximum value of the big_im (becomes 1 after scaling)
     """
     # Calculate the number of rows and columns to display
     nrows = np.int32(np.ceil(w.shape[-1] / cols))
@@ -240,14 +239,15 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True):
 
     Parameters
     ----------
-    x : ndarray of floats of shape (x, y, c)
-        array of imgs to show
+    x : ndarray or list(ndarray).
+        Array of images to show. Can either be an array of floats of shape
+        (x, y, c) or a list of length c of ndarrays of shape (x, y).
     cols : int
         number of columns to split into
     draw : bool
         True means we will make the calls to plt.imshow, False and we won't,
         only return the big_im array for the caller to handle as they please.
-    ax : None or matplotlib axis
+    ax : None or :py:class:`matplotlib.axes.Axes`.
         The axis to plot to. If set to None, will create a new axis and plot to
         it (only if draw is True).
     scale_individual : bool
@@ -256,9 +256,12 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True):
 
     Returns
     -------
-    big_img : ndarray of floats of shape (h, w)
-        the combined big image array.
+    big_im : ndarray(floats)
+        The combined big image array.
     """
+    if type(x) is list:
+        x = np.stack(x, axis=-1)
+
     # Calculate the number of rows and columns to display
     nrows = np.int32(np.ceil(x.shape[-1] / cols))
 
@@ -316,14 +319,16 @@ def plot_batch_colour(x, cols=8, draw=True, ax=None, scale_individual=True):
 
     Parameters
     ----------
-    x : ndarray of floats of shape (x, y, c, 3)
-        array of imgs to show
+    x : ndarray or list(ndarray)
+        Array of images to show. If input is an ndarray, should be of shape
+        (batch, x, y, 3). Can also be a list of length `batch`, with each entry
+        being an ndarray of shape (x, y, 3)
     cols : int
         number of columns to split into
     draw : bool
         True means we will make the calls to plt.imshow, False and we won't,
         only return the big_im array for the caller to handle as they please.
-    ax : None or matplotlib axis
+    ax : None or :py:class:`matplotlib.axes.Axes`
         The axis to plot to. If set to None, will create a new axis and plot to
         it (only if draw is True).
     scale_individual : bool
@@ -332,9 +337,12 @@ def plot_batch_colour(x, cols=8, draw=True, ax=None, scale_individual=True):
 
     Returns
     -------
-    big_img : ndarray of floats of shape (h, w)
-        the combined big image array.
+    big_im : ndarray
+        The combined big image array.
     """
+    if type(x) is list:
+        x = np.stack(x, axis=0)
+
     # If x is grayscale (of shape [n, x, y]), stack it to be rgb
     if len(x.shape) == 3:
         x = np.stack([x, x, x], axis=-1)
@@ -389,17 +397,24 @@ def zoom_batch_colour(x, centres, size=10):
 
     Parameters
     ----------
-    x : ndarray of floats of shape (N, height, width, 3)
-    centres : ndarray of floats of shape (N, 2) in range [0,1]
-        array of centre points. Shape [N, 2]. Float value between 0 and 1
-    seize : int
+    x : ndarray or list(ndarray)
+        Input. Can be an numpy array floats of shape (N, height, width, 3) or
+        list of length N of numpy arrays of floats, each of shape (height,
+        width, 3).
+    centres : ndarray
+        Array of centre points. Shape must be (N, 2) and the values should be
+        floats between 0 and 1.
+    size : int
         size in pixels of area to zoom in on
 
     Returns
     -------
     xzoom : float
-        zoomed images
+        One big image made up of the patches of zoomed images from the input.
     """
+    if type(x) is list:
+        x = np.stack(x, axis=0)
+
     # Check if the centres was a single tuple/list
     centres = np.array(centres)
     if centres.shape == (2,):
@@ -454,16 +469,16 @@ def plot_axgrid(h, w, **kwargs):
     Parameters
     ----------
     h : int
-        number of rows in the grid
+        Number of rows in the grid.
     w : int
-        number of cols in the grid
+        Number of cols in the grid.
     kwargs : (key, val) pairs
-        Matplotlib Figure keyword args
+        :py:class:`matplotlib.figure.Figure` keyword args.
 
     Returns
     -------
-    tuple of (fig, axes)
-        figure handle and array of matplotlib axes
+    fig : :py:class:`matplotlib.figure.Figure`
+    axes : :py:class:`matplotlib.axes.Axes`
     """
     space = 0.02
     default_args = {
