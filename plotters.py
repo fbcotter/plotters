@@ -48,7 +48,7 @@ def imshowNormalize(data, vmin=None, vmax=None, return_scale=False):
         return np.clip((data-vmin)/(vmax-vmin),0,1)
 
 
-def imshow(data, ax=None):
+def imshow(data, ax=None, **kwargs):
     """ Imshow with float scaling first
 
     Calls :py:func:`imshowNormalize` before calling matplotlib's imshow.
@@ -60,11 +60,22 @@ def imshow(data, ax=None):
     ax : None or :py:class:`matplotlib.axes.Axes`.
         If None, will get the currently active axis and plot to it. Otherwise,
         can give it the axis object to plot to.
+    kwargs : dict
+        Key, value pairs for the axis imshow function to use.
+
+    Notes
+    -----
+    By default, I use cmap='gray' and interpolation='none' for my imshow kwargs
+    as this is what I want to do almost all of the time.
     """
     if ax is None:
         ax = plt.gca()
 
-    ax.imshow(imshowNormalize(data), cmap='gray', interpolation='none')
+    defaults = {'cmap': 'gray', 'interpolation': 'none'}
+    for key, val in kwargs.items():
+        defaults[key] = val
+
+    ax.imshow(imshowNormalize(data), **defaults)
     ax.set_xticks([])
     ax.set_yticks([])
     ax.set_position([0,0,1,1])
