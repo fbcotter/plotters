@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 __author__ = "Fergal Cotter"
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
 
 
@@ -78,7 +78,7 @@ def imshow(data, ax=None, **kwargs):
     ax.imshow(imshowNormalize(data), **defaults)
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_position([0,0,1,1])
+    #  ax.set_position([0,0,1,1])
 
 
 def plot_sidebyside(im1, im2, axes=None):
@@ -243,7 +243,8 @@ def plot_filters_colour(w, cols=8, draw=True, ax=None):
     return big_im, vmin, vmax
 
 
-def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True):
+def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
+                     vmin=None, vmax=None):
     """Display a 3d tensor as a grid of activations
 
     Scales the activations and plots them as images.
@@ -264,6 +265,12 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True):
     scale_individual : bool
         If true, will scale each of the c activations to be in the range 0 to 1.
         If false, will scale the entire input, x, to be in the range 0 to 1.
+    vmin : float or None
+        Value to set as the negative limit (black). If None, will calculate
+        from data.
+    vmax : float or None
+        Value to set as the positive limit (white). If None, will calculate
+        from data.
 
     Returns
     -------
@@ -289,11 +296,12 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True):
                 else:
                     big_im[i*x.shape[0]:(i+1)*x.shape[0],
                            j*x.shape[1]:(j+1)*x.shape[1]] = \
-                        imshowNormalize(x[:,:,i*cols+j])
+                        imshowNormalize(x[:,:,i*cols+j], vmin, vmax)
 
     # If we didn't scale already, scale now
     if not scale_individual:
-        big_im, vmin, vmax = imshowNormalize(big_im, return_scale=True)
+        big_im, vmin, vmax = imshowNormalize(big_im, vmin, vmax,
+                                             return_scale=True)
 
     # Display the image
     if draw:
