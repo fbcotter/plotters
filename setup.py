@@ -39,6 +39,7 @@ setup(
     license="MIT",
     keywords="matplotlib, images, plotting",
     url="https://github.com/fbcotter/plotters.git",
+    download_url="https://github.com/fbcotter/plotters/archive/0.0.3.tar.gz",
     long_description=read('README.rst'),
     classifiers=classifiers,
     py_modules=["plotters"],
