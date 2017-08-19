@@ -479,7 +479,7 @@ def zoom_batch_colour(x, centres, size=10):
     return xzoom
 
 
-def plot_axgrid(h, w, **kwargs):
+def plot_axgrid(h, w, top=1, **kwargs):
     """ Create a grid of axes of size h x w
 
     Creates a figure with tight layout and thin black borders between images.
@@ -491,6 +491,9 @@ def plot_axgrid(h, w, **kwargs):
         Number of rows in the grid.
     w : int
         Number of cols in the grid.
+    top : float
+        Extent of the subfigures at the top. Useful to give space for titles and
+        what not.
     kwargs : (key, val) pairs
         :py:class:`matplotlib.figure.Figure` keyword args.
 
@@ -510,5 +513,5 @@ def plot_axgrid(h, w, **kwargs):
         h, w, **default_args,
         subplot_kw={'xticks': [], 'yticks': []},
         gridspec_kw={'hspace': space, 'wspace': space, 'left': space,
-                     'bottom': space, 'top': 1 - space, 'right': 1 - space})
+                     'bottom': space, 'top': top - space, 'right': 1 - space})
     return fig, axes
