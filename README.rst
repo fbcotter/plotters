@@ -2,15 +2,24 @@ Fergal's Plotters
 =================
 This library provides some convenience functions for doing some plotting
 operations I need to do regularly with matplotlib. For a demo on how to use
-them, look at the `Plotters Functions Demo`__ notebook.
+them and what they do, look at the `Plotters Functions Demo`__ notebook.
 
 __ https://github.com/fbcotter/plotters/blob/master/Plotters%20Functions%20Demo.ipynb
 
+The Sphinx version of the documentation can be found `here`__.
+
+__ https://plotters.readthedocs.io
 
 .. _installation-label:
 
 Installation
 ------------
+From PyPi:
+
+.. code: bash
+    
+    $ pip install fbc.plotters
+    
 Direct install from github (useful if you use pip freeze). To get the master
 branch, try::
 
