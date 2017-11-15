@@ -2,11 +2,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 __author__ = "Fergal Cotter"
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
 
 
 def imshowNormalize(data, vmin=None, vmax=None, return_scale=False):
+    """
+    See plotters.normalize
+    """
+    normalize(data, vmin, vmax, return_scale)
+
+
+def normalize(data, vmin=None, vmax=None, return_scale=False):
     """ Define a function to scale colour filters
 
     Useful for plotting 3 channel values that are not normalized between 0 and
@@ -46,6 +53,49 @@ def imshowNormalize(data, vmin=None, vmax=None, return_scale=False):
         return np.clip((data-vmin)/(vmax-vmin),0,1), vmin, vmax
     else:
         return np.clip((data-vmin)/(vmax-vmin),0,1)
+
+
+def phase_plot(Z, zero_is_black=True):
+    """
+    Creates an image from the complex array Z.
+
+    Scales Z so that the largest magnitude is 1. The complex argument is used to
+    position 3 sinusoids for the R, G, and B channels. When the argument is 0,
+    the green channel is largest. When it is 2π/3, the red channel is largest,
+    and when it is -2π/3, the blue channel is the largest.
+
+    Parameters
+    ----------
+    Z : ndarray
+        Complex 2d array of numbers
+    zero_is_black : bool
+        True if we want areas with 0 magnitude to be black. If false, they will
+        be grey.
+
+    Returns
+    -------
+    Y : ndarray
+        RGB image of same size as Z.
+    """
+    im = np.imag(Z)
+    re = np.real(Z)
+
+    phase = np.arctan2(im, re)
+    amplitude = np.abs(Z)
+    amplitude = amplitude/np.max(amplitude)
+
+    # Declare an RGB array
+    Y = np.zeros((*Z.shape, 3))
+    if zero_is_black:
+        Y[:,:,0] = 0.5*amplitude*(np.cos(phase - 2*np.pi/3) + 1)
+        Y[:,:,1] = 0.5*amplitude*(np.cos(phase) + 1)
+        Y[:,:,2] = 0.5*amplitude*(np.cos(phase + 2*np.pi/3) + 1)
+    else:
+        Y[:,:,0] = 0.5 + 0.5*amplitude*np.cos(phase - 2*np.pi/3)
+        Y[:,:,1] = 0.5 + 0.5*amplitude*np.cos(phase)
+        Y[:,:,2] = 0.5 + 0.5*amplitude*np.cos(phase + 2*np.pi/3)
+
+    return Y
 
 
 def imshow(data, ax=None, **kwargs):
