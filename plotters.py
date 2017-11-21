@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 __author__ = "Fergal Cotter"
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
 
 
@@ -10,7 +10,7 @@ def imshowNormalize(data, vmin=None, vmax=None, return_scale=False):
     """
     See plotters.normalize
     """
-    normalize(data, vmin, vmax, return_scale)
+    return normalize(data, vmin, vmax, return_scale)
 
 
 def normalize(data, vmin=None, vmax=None, return_scale=False):
