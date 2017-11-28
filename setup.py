@@ -11,7 +11,7 @@ from setuptools import setup
 def read(fname):
     enc = 'utf-8'
     return open(os.path.join(os.path.dirname(__file__), fname), 'r',
-                encoding=enc).read()
+                encoding=enc).readlines()
 
 
 # Read metadata from version file
