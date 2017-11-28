@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 __author__ = "Fergal Cotter"
-__version__ = "0.0.3"
+__version__ = "0.0.5"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
 
 

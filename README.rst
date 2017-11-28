@@ -1,8 +1,11 @@
-Fergal's Plotters
-=================
+Plotters
+========
 This library provides some convenience functions for doing some plotting
-operations I need to do regularly with matplotlib. For a demo on how to use
-them and what they do, look at the `Plotters Functions Demo`__ notebook.
+operations with matplotlib. In particular, for image processing and image
+analysis that often involves converting to floats and having arbitrary scales.
+
+For a demo on how to use them and what they do, look at the `Plotters Functions
+Demo`__ notebook.
 
 __ https://github.com/fbcotter/plotters/blob/master/Plotters%20Functions%20Demo.ipynb
 
@@ -14,11 +17,10 @@ __ https://plotters.readthedocs.io
 
 Installation
 ------------
-From PyPi:
 
-.. code: bash
-    
-    $ pip install fbc.plotters
+From PyPi::
+
+    $ pip install plotters
     
 Direct install from github (useful if you use pip freeze). To get the master
 branch, try::
@@ -49,5 +51,5 @@ system::
 
     $ python setup.py build_sphinx
 
-Compiled documentation may be found in ``build/docs/html/`` (index.html will be
+Compiled documentation will then be found in ``build/docs/html/`` (index.html will be
 the homepage)

@@ -9,15 +9,17 @@ from setuptools import setup
 # README file and 2) it's easier to type in the README file than to put a raw
 # string in below ...
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    enc = 'utf-8'
+    return open(os.path.join(os.path.dirname(__file__), fname), 'r',
+                encoding=enc).read()
 
 
 # Read metadata from version file
 def get_version():
-    with open("plotters.py") as f:
-        for line in f:
-            if line.startswith("__version__"):
-                return line[15:-2]
+    f = read("plotters.py")
+    for line in f:
+        if line.startswith("__version__"):
+            return line[15:-2]
     raise Exception("Could not find version number")
 
 
