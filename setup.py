@@ -8,16 +8,24 @@ from setuptools import setup
 # Used for the long_description.  It's nice, because now 1) we have a top level
 # README file and 2) it's easier to type in the README file than to put a raw
 # string in below ...
+def readlines(fname):
+    enc = 'utf-8'
+    return open(os.path.join(os.path.dirname(__file__), fname), 'r',
+                encoding=enc).readlines()
+
+
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    enc = 'utf-8'
+    return open(os.path.join(os.path.dirname(__file__), fname), 'r',
+                encoding=enc).read()
 
 
 # Read metadata from version file
 def get_version():
-    with open("plotters.py") as f:
-        for line in f:
-            if line.startswith("__version__"):
-                return line[15:-2]
+    f = readlines("plotters.py")
+    for line in f:
+        if line.startswith("__version__"):
+            return line[15:-2]
     raise Exception("Could not find version number")
 
 
@@ -32,7 +40,8 @@ classifiers = [
 
 setup(
     name='plotters',
-    version=get_version(),
+    #  version=get_version(),
+    version="0.0.5",
     author="Fergal Cotter",
     author_email="fbc23@cam.ac.uk",
     description=("Convenience Functions for Plotting in Matplotlib"),
@@ -44,8 +53,8 @@ setup(
     classifiers=classifiers,
     py_modules=["plotters"],
     install_requires=["numpy", "matplotlib"],
-    tests_require=["pytest"],
-    extras_require={
-        'docs': ['sphinx', 'docutils']
-    }
+    #  tests_require=["pytest"],
+    #  extras_require={
+        #  'docs': ['sphinx', 'docutils']
+    #  }
 )
