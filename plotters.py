@@ -622,7 +622,15 @@ def plot_dtcwt(yl, yh, fig=None, f=np.abs, top=1, fmt='chw', imshow_kwargs={}):
         else:
             x = np.linspace(vmin, vmax, 50)
         # Fit a kernel to it
-        density = stats.gaussian_kde(yh_disp[j].ravel())
+        try:
+            density = stats.gaussian_kde(yh_disp[j].ravel())
+        except np.linalg.LinAlgError:
+            def delta(x):
+                if x == 0:
+                    return 1
+                else:
+                    return 0
+            density = np.vectorize(delta)
         y = density(x)
         # Plot it vertically and then make it right-aligned
         hist.set_xlim(y.max(), 0)
