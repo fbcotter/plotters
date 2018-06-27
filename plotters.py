@@ -4,7 +4,7 @@ import matplotlib.gridspec as gridspec
 import scipy.stats as stats
 
 __author__ = "Fergal Cotter"
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
 
 
@@ -127,7 +127,7 @@ def imshow(data, ax=None, **kwargs):
     for key, val in kwargs.items():
         defaults[key] = val
 
-    ax.imshow(imshowNormalize(data), **defaults)
+    ax.imshow(normalize(data), **defaults)
     ax.set_xticks([])
     ax.set_yticks([])
     #  ax.set_position([0,0,1,1])
@@ -136,7 +136,7 @@ def imshow(data, ax=None, **kwargs):
 def plot_sidebyside(im1, im2, axes=None):
     """ Plot two images next to each other.
 
-    Calls :py:func:`imshowNormalize` before calling matplotlib's imshow on two
+    Calls :py:func:`normalize` before calling matplotlib's imshow on two
     images.
 
     Parameters
@@ -158,8 +158,8 @@ def plot_sidebyside(im1, im2, axes=None):
         assert len(axes) >= 2
 
     # Create the indices for displaying
-    im1_scaled = imshowNormalize(im1)
-    im2_scaled = imshowNormalize(im2)
+    im1_scaled = normalize(im1)
+    im2_scaled = normalize(im2)
     axes[0].imshow(im1_scaled, interpolation='none')
     axes[1].imshow(im2_scaled, interpolation='none')
     axes[0].set_xticks([])
@@ -211,8 +211,8 @@ def zoom_sidebyside(im1, im2, centre, size, axes=None):
                int(np.minimum(im1.shape[0], c[0]+size/2)))
     s1 = slice(int(np.maximum(0, c[1]-size/2)),
                int(np.minimum(im1.shape[1], c[1]+size/2)))
-    im1_scaled = imshowNormalize(im1[s0,s1,:])
-    im2_scaled = imshowNormalize(im2[s0,s1,:])
+    im1_scaled = normalize(im1[s0,s1,:])
+    im2_scaled = normalize(im2[s0,s1,:])
     axes[0].imshow(im1_scaled, interpolation='none')
     axes[1].imshow(im2_scaled, interpolation='none')
     axes[0].set_xticks([])
@@ -267,7 +267,7 @@ def plot_filters_colour(w, cols=8, draw=True, ax=None):
                        j*w.shape[1]:(j+1)*w.shape[1], :] = w[:,:,:,i*cols+j]
 
     # Calculate the min and max values of the weights to normalize
-    big_im, vmin, vmax = imshowNormalize(big_im, return_scale=True)
+    big_im, vmin, vmax = normalize(big_im, return_scale=True)
 
     # Display the image
     if draw:
@@ -319,10 +319,10 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
         If false, will scale the entire input, x, to be in the range 0 to 1.
     vmin : float or None
         Value to set as the negative limit (black). If None, will calculate
-        from data.
+        from data. Ignored if scale_individual is True.
     vmax : float or None
         Value to set as the positive limit (white). If None, will calculate
-        from data.
+        from data. Ignored if scale_individual is True.
 
     Returns
     -------
@@ -348,12 +348,12 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
                 else:
                     big_im[i*x.shape[0]:(i+1)*x.shape[0],
                            j*x.shape[1]:(j+1)*x.shape[1]] = \
-                        imshowNormalize(x[:,:,i*cols+j], vmin, vmax)
+                        normalize(x[:,:,i*cols+j])
 
     # If we didn't scale already, scale now
     if not scale_individual:
-        big_im, vmin, vmax = imshowNormalize(big_im, vmin, vmax,
-                                             return_scale=True)
+        big_im, vmin, vmax = normalize(big_im, vmin, vmax,
+                                       return_scale=True)
 
     # Display the image
     if draw:
@@ -361,7 +361,7 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
             ax = plt.gca()
             ax.set_position([0, 0, 1, 1])
 
-        ax.imshow(big_im, interpolation='none',cmap='gray')
+        ax.imshow(big_im, interpolation='none',cmap='gray',vmin=0, vmax=1)
 
         # Show some gridlines
         # Gridlines based on minor ticks
@@ -431,7 +431,7 @@ def plot_batch_colour(x, cols=8, draw=True, ax=None, scale_individual=True):
                 if scale_individual:
                     big_im[i*x.shape[1]:(i+1)*x.shape[1],
                            j*x.shape[2]:(j+1)*x.shape[2], :] = \
-                        imshowNormalize(x[i*cols+j,:,:,:])
+                        normalize(x[i*cols+j,:,:,:])
                 else:
                     big_im[i*x.shape[1]:(i+1)*x.shape[1],
                            j*x.shape[2]:(j+1)*x.shape[2], :] = \
@@ -439,7 +439,7 @@ def plot_batch_colour(x, cols=8, draw=True, ax=None, scale_individual=True):
 
     # If we didn't scale already, scale now
     if not scale_individual:
-        big_im, vmin, vmax = imshowNormalize(big_im, return_scale=True)
+        big_im, vmin, vmax = normalize(big_im, return_scale=True)
 
     # Display the image
     if draw:
