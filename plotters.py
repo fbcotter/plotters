@@ -15,7 +15,8 @@ def imshowNormalize(data, vmin=None, vmax=None, return_scale=False):
     return normalize(data, vmin, vmax, return_scale)
 
 
-def normalize(data, vmin=None, vmax=None, return_scale=False):
+def normalize(data, vmin=None, vmax=None, return_scale=False,
+              make_symmetric=False):
     """ Define a function to scale colour filters
 
     Useful for plotting 3 channel values that are not normalized between 0 and
@@ -32,6 +33,8 @@ def normalize(data, vmin=None, vmax=None, return_scale=False):
         Maximum scale value. If set to None, will use the maximum value in data
     return_scale: bool
         If true, will return what the calculated vmin and vmax were
+    make_symmetric: bool
+        If vmin and vmax are None, will ensure that 0.0 is the gray level
 
     Returns
     -------
@@ -46,6 +49,11 @@ def normalize(data, vmin=None, vmax=None, return_scale=False):
 
     if vmax is None:
         vmax = np.max(data)
+
+    if make_symmetric:
+        m = max(abs(vmin), vmax)
+        vmin = -m
+        vmax = m
 
     # Ensure numerical stability
     if vmax <= vmin + 0.001:
@@ -296,7 +304,7 @@ def plot_filters_colour(w, cols=8, draw=True, ax=None):
 
 
 def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
-                     vmin=None, vmax=None):
+                     vmin=None, vmax=None, make_symmetric=False):
     """Display a 3d tensor as a grid of activations
 
     Scales the activations and plots them as images.
@@ -342,13 +350,14 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
     for i in range(nrows):
         for j in range(cols):
             if i*cols + j < x.shape[-1]:
-                if not scale_individual:
-                    big_im[i*x.shape[0]:(i+1)*x.shape[0],
-                           j*x.shape[1]:(j+1)*x.shape[1]] = x[:,:,i*cols+j]
-                else:
+                if scale_individual:
                     big_im[i*x.shape[0]:(i+1)*x.shape[0],
                            j*x.shape[1]:(j+1)*x.shape[1]] = \
-                        normalize(x[:,:,i*cols+j])
+                        normalize(x[:,:,i*cols+j],
+                                  make_symmetric=make_symmetric)
+                else:
+                    big_im[i*x.shape[0]:(i+1)*x.shape[0],
+                           j*x.shape[1]:(j+1)*x.shape[1]] = x[:,:,i*cols+j]
 
     # If we didn't scale already, scale now
     if not scale_individual:
