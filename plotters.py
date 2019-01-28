@@ -56,8 +56,8 @@ def normalize(data, vmin=None, vmax=None, return_scale=False,
         vmax = m
 
     # Ensure numerical stability
-    if vmax <= vmin + 0.001:
-        vmax = vmin + 0.001
+    if vmax <= vmin + 0.00001:
+        vmax = vmin + 0.00001
 
     if return_scale:
         return np.clip((data-vmin)/(vmax-vmin),0,1), vmin, vmax
@@ -231,7 +231,7 @@ def zoom_sidebyside(im1, im2, centre, size, axes=None):
     axes[1].set_position([0.525, 0, 0.45, 1])
 
 
-def plot_filters_colour(w, cols=8, draw=True, ax=None):
+def plot_filters_colour(w, cols=8, draw=True, ax=None, reverse=False):
     """ Plot colour filters in a grid
 
     Display the fiter, w as a grid of n x cols images with no pad
@@ -240,7 +240,8 @@ def plot_filters_colour(w, cols=8, draw=True, ax=None):
     Parameters
     ----------
     w : ndarray(float)
-        Array of imgs to show. Should be of shape (x, y, 3, c).
+        Array of imgs to show. Should be of shape (x, y, 3, c) or
+        (n, 3, x, y) if reverse=True
     cols : int
         number of columns to split the filters into
     draw : bool
@@ -261,6 +262,9 @@ def plot_filters_colour(w, cols=8, draw=True, ax=None):
     vmax : float
         The maximum value of the big_im (becomes 1 after scaling)
     """
+    if reverse:
+        w = w.transpose(2,3,1,0)
+
     # Calculate the number of rows and columns to display
     nrows = np.int32(np.ceil(w.shape[-1] / cols))
 
@@ -304,7 +308,7 @@ def plot_filters_colour(w, cols=8, draw=True, ax=None):
 
 
 def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
-                     vmin=None, vmax=None, make_symmetric=False):
+                     vmin=None, vmax=None, make_symmetric=False, reverse=False):
     """Display a 3d tensor as a grid of activations
 
     Scales the activations and plots them as images.
@@ -313,7 +317,8 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
     ----------
     x : ndarray or list(ndarray).
         Array of images to show. Can either be an array of floats of shape
-        (x, y, c) or a list of length c of ndarrays of shape (x, y).
+        (x, y, c) or (c, x, y) if reverse = True, or a list of length c of
+        ndarrays of shape (x, y).
     cols : int
         number of columns to split into
     draw : bool
@@ -339,6 +344,8 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
     """
     if type(x) is list:
         x = np.stack(x, axis=-1)
+    elif reverse:
+        x = x.transpose(1,2,0)
 
     # Calculate the number of rows and columns to display
     nrows = np.int32(np.ceil(x.shape[-1] / cols))
@@ -360,9 +367,9 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
                            j*x.shape[1]:(j+1)*x.shape[1]] = x[:,:,i*cols+j]
 
     # If we didn't scale already, scale now
-    if not scale_individual:
-        big_im, vmin, vmax = normalize(big_im, vmin, vmax,
-                                       return_scale=True)
+    #  if not scale_individual:
+        #  big_im, vmin, vmax = normalize(big_im, vmin, vmax,
+                                       #  return_scale=True)
 
     # Display the image
     if draw:
@@ -370,7 +377,7 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
             ax = plt.gca()
             ax.set_position([0, 0, 1, 1])
 
-        ax.imshow(big_im, interpolation='none',cmap='gray',vmin=0, vmax=1)
+        ax.imshow(big_im, interpolation='none',cmap='gray', vmin=vmin, vmax=vmax)
 
         # Show some gridlines
         # Gridlines based on minor ticks
@@ -390,7 +397,8 @@ def plot_activations(x, cols=8, draw=True, ax=None, scale_individual=True,
     return big_im
 
 
-def plot_batch_colour(x, cols=8, draw=True, ax=None, scale_individual=True):
+def plot_batch_colour(x, cols=8, draw=True, ax=None, scale_individual=True,
+                      reverse=False):
     """ Plot a batch of colour images/patches.
 
     Display x as a grid of n x cols images with no pad between images and red
@@ -401,8 +409,9 @@ def plot_batch_colour(x, cols=8, draw=True, ax=None, scale_individual=True):
     ----------
     x : ndarray or list(ndarray)
         Array of images to show. If input is an ndarray, should be of shape
-        (batch, x, y, 3). Can also be a list of length `batch`, with each entry
-        being an ndarray of shape (x, y, 3)
+        (batch, x, y, 3) or (batch, 3, x, y) if reverse is true. Can also
+        be a list of length `batch`, with each entry being an ndarray of
+        shape (x, y, 3)
     cols : int
         number of columns to split into
     draw : bool
@@ -422,6 +431,8 @@ def plot_batch_colour(x, cols=8, draw=True, ax=None, scale_individual=True):
     """
     if type(x) is list:
         x = np.stack(x, axis=0)
+    elif reverse:
+        x = x.transpose(0,2,3,1)
 
     # If x is grayscale (of shape [n, x, y]), stack it to be rgb
     if len(x.shape) == 3:
