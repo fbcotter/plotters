@@ -4,7 +4,7 @@ import matplotlib.gridspec as gridspec
 import scipy.stats as stats
 
 __author__ = "Fergal Cotter"
-__version__ = "0.0.8"
+__version__ = "0.0.9"
 __version_info__ = tuple([int(d) for d in __version__.split(".")])  # noqa
 
 
@@ -687,3 +687,60 @@ def plot_dtcwt(yl, yh, fig=None, f=np.abs, top=1, fmt='chw', imshow_kwargs={}):
     cmap.imshow(gradient, cmap=imshow_kwargs['cmap'], aspect='auto')
     ax = fig.add_subplot(gs[J,2], xticks=[], yticks=[])
     ax.imshow(yl, **imshow_kwargs)
+
+
+def plot_preds(preds, labels, ax=None, **text_kwargs):
+    """ Plots a horizontal bar chart with the predictions and label texts.
+
+    Aims to mimic the plot style used by many ImageNet papers on how to present
+    the prediction outputs for a given image. Plots these on a horizontal bar
+    chart, with the highest prediction value appearing at the top, and the
+    lowest at the bottom. Since the labels are often quite long, they are put
+    inside the graph at the right had edge.
+
+    Parameters
+    ----------
+    preds: ndarray(float)
+        1d array of predictions for a given image. Can be as long as you like,
+        but will start to look squashed after 10 or so predictions.
+    labels: ndarray(str)
+        1d array of string labels. Must be the same length as preds.
+    ax: :py:class:`matplotlib.axes.Axes`
+        Axes to plot to.
+    text_kwargs:
+        Key value pair of properties and their values for how the labels should
+        be set. Default values are:
+
+          horizontalalignment=right
+          bbox={'facecolor':'gray', 'alpha':0.5, pad:5}
+
+        Putting the text on the right hand side and a bounding box around it.
+
+    """
+    assert ax is not None
+    assert len(preds) == len(labels)
+
+    default_args = {
+        'horizontalalignment': 'right',
+        'bbox': {'facecolor': 'gray', 'alpha':0.5, 'pad': 5},
+    }
+    for key, val in text_kwargs.items():
+        default_args[key] = val
+
+    # Plot a simple horizontal bar chart
+    ax.clear()
+    k = len(preds)
+    y_pos = np.arange(k)
+    ax.barh(y_pos, preds, align='center', alpha=0.4)
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels([])
+    ax.tick_params(direction='in')
+
+    # Put the tick label text on the right hand side. This is not normally
+    # supported so need to be tricky. Start by getting the y axis of the tick
+    # coordinates.
+    y_min, y_max = ax.get_ylim()
+    ticks = [(tick - y_min)/(y_max - y_min) for tick in ax.get_yticks()]
+    for i, tick in enumerate(ticks):
+        ax.text(0.97, tick, labels[i], transform=ax.transAxes,
+                **default_args)
